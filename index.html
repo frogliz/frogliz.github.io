@@ -1178,8 +1178,8 @@
           <a href="https://wa.me/5534999398808" class="contact-link" target="_blank">
             <div class="contact-link-icon">◎</div>WhatsApp — (34) 99939-8808
           </a>
-          <a href="https://github.com/nikolasrusso" class="contact-link" target="_blank">
-            <div class="contact-link-icon">⌥</div>github.com/nikolasrusso
+          <a href="https://github.com/frogliz" class="contact-link" target="_blank">
+            <div class="contact-link-icon">⌥</div>github.com/frogliz
           </a>
           <a href="https://linkedin.com/in/nikolasrusso" class="contact-link" target="_blank">
             <div class="contact-link-icon" style="font-size:0.75rem; font-weight:700;">in</div>
@@ -1188,18 +1188,19 @@
         </div>
       </div>
       <div class="reveal reveal-delay-3">
-        <form class="form" onsubmit="handleSubmit(event)">
+        <form class="form" id="contactForm">
           <div class="form-group">
             <label class="form-label">Seu nome</label>
-            <input type="text" class="form-input" placeholder="João Silva" required>
+            <input type="text" name="name" class="form-input" placeholder="João Silva" required>
           </div>
           <div class="form-group">
             <label class="form-label">E-mail</label>
-            <input type="email" class="form-input" placeholder="joao@empresa.com" required>
+            <input type="email" name="email" class="form-input" placeholder="joao@empresa.com" required>
           </div>
           <div class="form-group">
             <label class="form-label">Mensagem</label>
-            <textarea class="form-textarea" placeholder="Me conta sobre seu projeto..." required></textarea>
+            <textarea name="message" class="form-textarea" placeholder="Me conta sobre seu projeto..."
+              required></textarea>
           </div>
           <button type="submit" class="form-btn" id="submitBtn">Enviar mensagem →</button>
         </form>
@@ -1247,19 +1248,48 @@
     }, { threshold: 0.12 });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    function handleSubmit(e) {
+    document.getElementById('contactForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
-      btn.textContent = 'Enviado! ✓';
-      btn.style.background = '#22c55e';
-      btn.style.boxShadow = '0 0 30px rgba(34,197,94,0.4)';
-      setTimeout(() => {
-        btn.textContent = 'Enviar mensagem →';
-        btn.style.background = '';
-        btn.style.boxShadow = '';
-        e.target.reset();
-      }, 3000);
-    }
+      btn.textContent = 'Enviando...';
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+
+      const data = new FormData(this);
+
+      try {
+        const res = await fetch('https://formspree.io/f/mrejdznk', {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          btn.textContent = 'Mensagem enviada! ✓';
+          btn.style.background = '#22c55e';
+          btn.style.boxShadow = '0 0 30px rgba(34,197,94,0.4)';
+          btn.style.opacity = '1';
+          this.reset();
+          setTimeout(() => {
+            btn.textContent = 'Enviar mensagem →';
+            btn.style.background = '';
+            btn.style.boxShadow = '';
+            btn.disabled = false;
+          }, 4000);
+        } else {
+          throw new Error();
+        }
+      } catch {
+        btn.textContent = 'Erro ao enviar. Tente novamente.';
+        btn.style.background = '#ef4444';
+        btn.style.opacity = '1';
+        setTimeout(() => {
+          btn.textContent = 'Enviar mensagem →';
+          btn.style.background = '';
+          btn.disabled = false;
+        }, 3000);
+      }
+    });
   </script>
 </body>
 
